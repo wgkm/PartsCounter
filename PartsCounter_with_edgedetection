@@ -1,0 +1,80 @@
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+Adafruit_SSD1306 display = Adafruit_SSD1306(128, 32, &Wire);
+
+#define BUTTON_A  9
+#define BUTTON_B  6
+#define BUTTON_C  5
+
+int total_parts = 0;
+int pressA;
+int pressAlast;
+int pressB;
+int pressBlast;
+int pressC;
+int pressClast;
+
+
+void setup() {
+  Serial.begin(9600);
+
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C); // Address 0x3C for 128x32
+  
+  display.display();
+  delay(500);
+
+  display.clearDisplay();
+  display.display();
+
+  pinMode(BUTTON_A, INPUT_PULLUP);
+  pinMode(BUTTON_B, INPUT_PULLUP);
+  pinMode(BUTTON_C, INPUT_PULLUP);
+
+  display.setTextSize(4);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0,0);
+  display.print(total_parts);
+  display.setCursor(0,0);
+  display.display();
+}
+
+void loop() {
+  pressA = digitalRead(BUTTON_A);
+  pressB = digitalRead(BUTTON_B);
+  pressC = digitalRead(BUTTON_C);
+  delay(5);
+  
+  if(pressA && !pressAlast) {
+    total_parts++;
+    display.clearDisplay();
+    display.print(total_parts);
+    display.setCursor(0,0);
+    display.display();
+  }
+  if(pressB && !pressBlast) {
+    total_parts = total_parts - 1;
+    display.clearDisplay();
+    display.print(total_parts);
+    display.setCursor(0,0);
+    display.display();
+  }
+  if(pressC && !pressClast) {
+  total_parts = 0;
+  display.clearDisplay();
+  display.print(total_parts);
+  display.setCursor(0,0);
+  display.display();
+  }
+
+  // delay(100);
+
+  pressAlast = pressA;
+  pressBlast = pressB;  
+  pressClast = pressC;    
+
+  yield();
+  display.display();
+}
